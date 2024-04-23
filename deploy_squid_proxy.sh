@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: squid
-        image: sameersbn/squid:3.5.27-2
+        image: harbor-repo.vmware.com/dockerhub-proxy-cache/sameersbn/squid:3.5.27-2
         ports:
         - containerPort: 3128
         volumeMounts:
