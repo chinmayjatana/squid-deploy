@@ -5,13 +5,24 @@ DEPLOYMENT_NAME=squid-proxy
 SERVICE_NAME=squid-proxy-service
 NAMESPACE=proxy-ns
 CONFIG_NAME=squid-config
-CONFIG_FILE=squid.conf
+CONFIG_FILE=/tmp/squid.conf
 
 if  [[ "$DISTRIBUTION" == "Openshift" ]] || [[ "$DISTRIBUTION" == "TKGM" ]] || [[ "$DISTRIBUTION" == "TKGS" ]] || [[ "$DISTRIBUTION" == *"TKGI"* ]]; then
   SQUID_IMAGE="harbor-repo.vmware.com/dockerhub-proxy-cache/sameersbn/squid:3.5.27-2"
 else
   SQUID_IMAGE="sameersbn/squid:3.5.27-2"
 fi
+
+cat > /tmp/squid.conf <<EOF
+# Custom Squid config to allow HTTP and HTTPS
+acl SSL_ports port 443          # Define the SSL ports
+acl Safe_ports port 80 443      # Define safe ports
+acl CONNECT method CONNECT      # Allow CONNECT method
+http_access allow CONNECT SSL_ports
+http_access allow all
+http_port 3128
+visible_hostname squid
+EOF
 
 # Create Namespace
 kubectl create ns $NAMESPACE
